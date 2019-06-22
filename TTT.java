@@ -11,9 +11,10 @@ public class TTT {
 
 	public static void main(String[] args) {
 		System.out.println("Welcome to the game of Tic-Tac-Toe [Version 5.0]");
-
-		playerVersusCom();
-
+		
+		startGame();
+		
+		//Check if the user wants to continue or stop the game
 		while (true) {
 			System.out.println("Want to do this all... over... again? =_=");
 			System.out.println("Enter Y or N");
@@ -23,7 +24,7 @@ public class TTT {
 
 			if (continueGame.equalsIgnoreCase("Y") || continueGame.equalsIgnoreCase("Yes")) {
 				System.out.println("Since you ask for it. \nEnjoy!");
-				playerVersusCom();
+				startGame();
 			}
 
 			else if (continueGame.equalsIgnoreCase("N") || continueGame.equalsIgnoreCase("No")) {
@@ -48,26 +49,69 @@ public class TTT {
 	private static Random random = new Random();
 
 	//////////////////////////////////////////////////////////////////
-	/*
-	 * Prompt the user to play alone or against the computer
-	 */
-	public static void playerVersusCom() {
+	public static void startGame() {
+		initializeBoard();
+		printBoard();
+
 		System.out.println("Please enter 1 or 2:");
 		System.out.println("1. 1 Player Game; player vs. computer");
 		System.out.println("2. 2 Players Game; player vs. player");
-
 		numOfPlayers = input.nextInt();
 
 		while (true) {
 			// player versus computer
 			if (numOfPlayers == 1) {
-				System.out.println("Player_O is a preset computer player");
-				computerPlayer();
-				startGame(); 
+				System.out.println("NOTE: Player_O is a preset computer player");
+				do {
+					if(currentPlayer == 'O') {
+						computerPlayer();
+						System.out.println();
+						System.out.println("Player_" + currentPlayer + ", (Computer's turn)");
+						System.out.println("Row: " + row);
+						System.out.println("Column: " + col);
+						placeMark(currentPlayer);
+						changePlayer();
+					} else {
+						System.out.println();
+						System.out.println("Player_" + currentPlayer + ", (Human Player)");
+						System.out.println("Enter a number from 1-3");
+						System.out.print("Row: ");
+						row = input.nextInt() - 1;
+						System.out.print("Column: ");
+						col = input.nextInt() - 1;
+						
+						evaluatePlayerMoves();
+						placeMark(currentPlayer);
+						changePlayer();
+					}
+					
+					// Check for tie
+					if (space() == true) {
+						break;
+					}
+				// Keep playing while there's still no winner found
+				} while (!checkForWin());
+				break;
 			}
 			// player versus player
 			else if (numOfPlayers == 2) {
-				startGame();
+				do {
+					System.out.println("Player_" + currentPlayer + ", ");
+					System.out.println("Enter a number from 1-3");
+					System.out.print("Row: ");
+					row = input.nextInt() - 1;
+					System.out.print("Column: ");
+					col = input.nextInt() - 1;
+
+					evaluatePlayerMoves();
+					placeMark(currentPlayer);
+					changePlayer();
+
+					if (space() == true) {
+						break;
+					}
+				} while (!checkForWin());
+				break;
 			}
 
 			else {
@@ -75,29 +119,6 @@ public class TTT {
 				System.out.println("Enter 1 or 2");
 			}
 		}
-	}
-
-	public static void startGame() {
-		initializeBoard();
-		printBoard();
-
-		do {
-			System.out.println("Player_" + currentPlayer + ", ");
-			System.out.println("Enter a number from 1-3");
-			System.out.print("Row: ");
-			row = input.nextInt() - 1;
-			System.out.print("Column: ");
-			col = input.nextInt() - 1;
-
-			evaluatePlayerMoves();
-			placeMark(currentPlayer);
-			changePlayer();
-
-			if (space() == true) {
-				// if the board is full, tie, exit the do-while loop
-				break;
-			}
-		} while (!checkForWin());
 	}
 
 	public static void initializeBoard() {
@@ -120,10 +141,10 @@ public class TTT {
 	}
 
 	public static void placeMark(char c) {
-		if (currentPlayer == 'X') {
-			board[row][col] = 'X';
+		if (currentPlayer == c) {
+			board[row][col] = c;
 		} else {
-			board[row][col] = 'O';
+			board[row][col] = c;
 		}
 		printBoard();
 		status();
@@ -235,7 +256,7 @@ public class TTT {
 
 			// check for space availability
 			if (board[row][col] == '-') {
-				placeMark('O');
+				board[row][col] = 'O';
 				break;
 			}
 		}
